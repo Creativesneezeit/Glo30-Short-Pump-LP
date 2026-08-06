@@ -3,9 +3,9 @@
   "configurations": [
     {
       "name": "lp",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8123"],
-      "port": 8123
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server.js"],
+      "port": 3000
     }
   ]
 }

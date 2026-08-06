@@ -43,6 +43,13 @@
     if (input) input.value = val;
   });
 
+  (function () {
+    var url = document.querySelector('input[name="page_url"]');
+    var ref = document.querySelector('input[name="referrer"]');
+    if (url) url.value = window.location.href;
+    if (ref) ref.value = document.referrer || '';
+  })();
+
   /* ------------------------------------------------------------ analytics */
   function track(event, detail) {
     window.dataLayer = window.dataLayer || [];
@@ -113,12 +120,28 @@
 
     track('generate_lead', { form: 'short_pump_lp', interest: form.elements.interest.value });
 
-    // TODO: replace with the real submit. Two options, pick one at launch:
-    //   1. remove this handler's preventDefault and let the form POST to `action`
-    //   2. fetch(form.action, { method: 'POST', body: new FormData(form) })
-    //      then redirect to /thank-you/ so the Ads conversion fires on a URL.
-    status.textContent = 'Thanks — we’ll text you shortly to confirm your time.';
-    form.querySelector('button[type="submit"]').disabled = true;
+    var button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    status.textContent = 'Sending…';
+
+    // The GHL external-tracking script listens on this same submit event and
+    // captures the lead client-side. Our POST is the primary path; if it fails
+    // the visitor still lands on /thank-you/ and GHL still has the lead.
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(new FormData(form)).toString()
+    })
+      .then(function (res) { return res.json().catch(function () { return {}; }); })
+      .then(function (data) {
+        window.location.assign((data && data.redirect) || '/thank-you/');
+      })
+      .catch(function (err) {
+        // Network-level failure only. Still send them through — the tracking
+        // script has the lead, and a dead end here costs a real booking.
+        console.error('[lead] submit failed:', err);
+        window.location.assign('/thank-you/');
+      });
   });
 
   /* ------------------------------------------------------------- footer yr */

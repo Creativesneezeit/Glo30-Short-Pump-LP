@@ -1,0 +1,14 @@
+{
+  "name": "glo30-short-pump-lp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GLO30 Short Pump Google Ads landing page — static site plus a lead-delivery route to GoHighLevel.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

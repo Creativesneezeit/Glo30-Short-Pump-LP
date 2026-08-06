@@ -1,17 +1,23 @@
 # GLO30 Short Pump — Google Ads landing page
 
-Static, no build step. Serve the folder root; all asset paths are absolute (`/assets/...`).
+Node server (no framework, no dependencies) serving a static page plus one lead route.
+Runs on Railway via `npm start`.
 
 ```bash
-python -m http.server 8123
+npm start
 ```
+
+Listens on `PORT` (Railway sets it), defaults to 3000.
 
 ---
 
 ## Files
 
 ```
+server.js               Node http: static files + POST /api/lead -> GoHighLevel
+package.json            start script, engines >=18. No dependencies.
 index.html
+thank-you/index.html    post-submit landing, Google Ads conversion placeholder
 assets/
   css/styles.css
   js/main.js
@@ -21,6 +27,58 @@ assets/
   video/  skin-analysis.{webm,mp4}   poster-skin-analysis.jpg
           client-review.{webm,mp4}   poster-client-review.jpg
 fonts/    images/    logo/     <- ORIGINAL source assets, not referenced. Do not deploy.
+```
+
+---
+
+## CRM: GoHighLevel lead delivery
+
+Two independent paths, by design. Either one alone still captures the lead.
+
+**(a) Primary — server-side.** The form POSTs to `/api/lead` in `server.js`, which calls
+`POST https://services.leadconnectorhq.com/contacts/` with `Version: 2021-07-28` and a
+Bearer token. It sends `firstName`/`lastName` (split from the single name field), `email`,
+`phone`, `source: "Google Ads - Short Pump Lander"`, tag `short-pump-landing`, a second
+tag `interest-<value>`, and an `attributionSource` block carrying the UTMs and `gclid`.
+
+**(b) Secondary — client-side.** GHL's External Tracking script sits immediately before
+`</body>` on both pages, exactly once. It watches the real `<form>` element and creates
+its own GHL submission event, independent of (a).
+
+The route **never fails the visitor**. A missing token, a GHL 4xx, a duplicate contact, a
+network timeout — all log server-side and still return `{ok:true, redirect:"/thank-you/"}`,
+because (b) already has the lead and a dead end costs a real booking. Delivery status is
+in the JSON as `delivered: true|false`, and in the logs.
+
+### Environment variables
+
+Set these in the Railway dashboard. The code reads them from the environment only —
+there are no defaults and no hardcoded fallbacks.
+
+| Name | Required | Purpose |
+|---|---|---|
+| `GHL_PRIVATE_INTEGRATION_TOKEN` | yes | Bearer token for the v2 API |
+| `GHL_LOCATION_ID` | yes | GHL sub-account the contact lands in |
+| `GHL_INTEREST_FIELD_ID` | no | If set, the offer label is also written to this custom field. Without it, the offer is captured as a tag only. |
+| `PORT` | no | Railway sets this automatically |
+
+Without the two required vars the server boots, serves the site, and logs
+`[server] GHL delivery DISABLED` — it does not crash.
+
+`GET /healthz` returns `{"ok":true,"ghlConfigured":true|false}` — quickest way to confirm
+Railway picked the vars up.
+
+### Interest values posted
+
+`smart-glo-99` · `tox` · `nano-glo` · `gloria-ai-scan`
+
+### Log lines to watch
+
+```
+[lead] delivered to GHL { contactId: '...', interest: 'nano-glo', email: '...' }
+[lead] GHL rejected 401 {"statusCode":401,"message":"Invalid JWT"}
+[lead] NOT DELIVERED — missing env vars: GHL_PRIVATE_INTEGRATION_TOKEN
+[lead] honeypot triggered, discarded
 ```
 
 ---
@@ -113,20 +171,21 @@ Each one is marked with a `TODO` comment at the point of use.
 | Street address and hours are unverified | `index.html` location section |
 | The "$30 off" line was removed from the form card, but the sticky mobile CTA still reads "Book my facial — $30 off" and the footer disclaimer still references an offer | `index.html` sticky mobile CTA + footer |
 | "4.9★ Google rating" in the trust bar is unverified | `index.html` trust bar |
-| Form `action` points at `#` and the submit handler only shows a message | `index.html` form, `assets/js/main.js` |
 | `<link rel="canonical">` points at `example.com` | `index.html` head |
+| Google Ads conversion ID and label are empty strings — the tag is inert until filled | `thank-you/index.html` |
 
 The page ships `noindex, nofollow` — correct for a paid lander. Remove it only if this
 is meant to rank organically.
 
-### Wiring the form
+### Form submit flow
 
-`main.js` validates, fires a `generate_lead` push to `dataLayer`, then stops. Pick one:
+`main.js` validates, pushes `generate_lead` to `dataLayer`, then POSTs the form
+url-encoded to `/api/lead` and redirects to the `redirect` path in the JSON response
+(`/thank-you/`). On a network-level failure it redirects anyway — the GHL tracking
+script has the lead either way.
 
-1. Let it POST natively — drop the `preventDefault()` and set a real `action`.
-2. `fetch(form.action, {method:'POST', body:new FormData(form)})`, then redirect to a
-   `/thank-you/` page. **Preferred** — a real URL gives Google Ads a clean conversion
-   trigger and a place to fire the conversion tag.
+The `<form>` keeps a real `action="/api/lead"` and `method="post"`, so it degrades to a
+native POST with JS disabled and stays visible to GHL's form detection.
 
 Hidden fields already capture `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`
 and `gclid` from the query string, plus `landing_page=short-pump`. A honeypot field
@@ -148,6 +207,22 @@ Checked at 1280 px, 390 px and 360 px: no horizontal overflow, fonts load, hero 
 loads at the right srcset step, both below-fold clips hydrate on scroll, form blocks on
 an unpicked `interest` and clears on change, empty/invalid/valid states all behave, UTM
 and `gclid` capture works.
+
+Lead route, tested locally against the live GHL endpoint:
+
+- `GET /healthz` → `{"ok":true,"ghlConfigured":false}` with no env vars set
+- `POST /api/lead` with no env vars → logs `NOT DELIVERED`, returns `redirect:/thank-you/`
+- `POST /api/lead` with a deliberately invalid token → real request reaches GoHighLevel,
+  which answers `401 {"statusCode":401,"message":"Invalid JWT"}`; server logs it and
+  still returns `redirect:/thank-you/`
+- Honeypot POST → discarded, success response
+- POST with neither email nor phone → `400 email_or_phone_required`
+- Browser submit → lands on `/thank-you/`, `lead_thank_you` in the dataLayer
+- Path traversal (`/../../../Windows/win.ini`) → 404
+- `https://go.cloudcrm.info/js/external-tracking.js` → 200
+
+**Not verified:** a successful `201` from GoHighLevel. That needs a real token and
+location id, which only exist in the Railway dashboard and the GHL account.
 
 Not yet checked on real hardware — **test iOS Safari autoplay on an actual iPhone**
 before spending money on it. Low Power Mode blocks autoplay outright; that is expected,

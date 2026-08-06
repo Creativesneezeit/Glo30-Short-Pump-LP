@@ -80,8 +80,10 @@
     <div class="form-card" id="lead-form">
       <h2 class="form-title">Claim your first facial</h2>
 
-      <!-- TODO: point `action` at the real CRM / booking endpoint -->
-      <form class="lead-form" action="#" method="post" novalidate data-form="lead">
+      <!-- Posts to the Node route in server.js, which creates the GoHighLevel contact.
+           Left as a real <form> with a native action so it still works without JS and
+           so the GHL external-tracking script can see it. -->
+      <form class="lead-form" action="/api/lead" method="post" novalidate data-form="lead">
         <div class="field">
           <label for="f-name">First and last name</label>
           <input id="f-name" name="name" type="text" autocomplete="name" required
@@ -122,6 +124,8 @@
         <input type="hidden" name="utm_term"     value="">
         <input type="hidden" name="gclid"        value="">
         <input type="hidden" name="landing_page" value="short-pump">
+        <input type="hidden" name="page_url"     value="">
+        <input type="hidden" name="referrer"     value="">
         <!-- Honeypot: real people never fill this -->
         <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -284,5 +288,11 @@
 </div>
 
 <script src="/assets/js/main.js" defer></script>
+
+<!-- GoHighLevel External Tracking (secondary/backup lead capture).
+     Auto-detects the <form> above and creates its own GHL submission event,
+     independent of the /api/lead server call. Must stay exactly once, here. -->
+<script src="https://go.cloudcrm.info/js/external-tracking.js"
+        data-tracking-id="tk_40d5372e2d4a4cd5aa2a1692378fc808"></script>
 </body>
 </html>
