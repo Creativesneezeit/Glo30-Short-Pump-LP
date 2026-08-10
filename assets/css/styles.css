@@ -8,6 +8,12 @@
 @font-face{font-family:"Argentum Sans";src:url("/assets/fonts/ArgentumSans-Black.woff2") format("woff2");font-weight:900;font-style:normal;font-display:swap}
 
 :root{
+  /* Two typefaces. --font-body is the existing self-hosted Argentum Sans stack,
+     lifted verbatim into a variable. --font-display is the Google-hosted
+     Playfair Display, used only on h1/h2 as an editorial accent. */
+  --font-body:"Argentum Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-display:"Playfair Display",Georgia,"Times New Roman",serif;
+
   --navy:#293376;
   --navy-deep:#1b2255;
   --blush:#e9c9bb;
@@ -28,7 +34,7 @@
 html{scroll-behavior:smooth}
 body{
   margin:0;
-  font-family:"Argentum Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-family:var(--font-body);
   color:var(--ink);
   background:var(--white);
   font-size:17px;
@@ -37,9 +43,18 @@ body{
 }
 img,video{display:block;max-width:100%}
 h1,h2,h3{line-height:1.12;margin:0 0 .5em;letter-spacing:-.015em;overflow-wrap:break-word}
-h1{font-weight:900;font-size:clamp(1.85rem,5.2vw,3.5rem)}
-h2{font-weight:700;font-size:clamp(1.6rem,3.4vw,2.4rem)}
-h3{font-weight:700;font-size:1.08rem}
+
+/* Playfair is a serif: it needs a touch more leading and none of the negative
+   tracking the sans headlines wanted. 700 is the heaviest weight loaded. */
+h1,h2{font-family:var(--font-display);font-weight:700;letter-spacing:-.005em;line-height:1.16}
+h1{font-size:clamp(2rem,5.4vw,3.6rem)}
+h2{font-size:clamp(1.65rem,3.5vw,2.5rem)}
+
+/* h3 (benefit-block headings) stay on the sans. */
+h3{font-family:var(--font-body);font-weight:700;font-size:1.08rem}
+/* Form card title takes the display face like every other h2. Size, weight and
+   tracking are left exactly as they were — only font-family changed. */
+.form-title{font-family:var(--font-display);letter-spacing:-.015em}
 p{margin:0 0 1em}
 a{color:var(--navy)}
 
@@ -145,19 +160,11 @@ a{color:var(--navy)}
 .form-fine{font-size:.78rem;color:var(--muted);margin:12px 0 0;text-align:center}
 .form-status{font-size:.9rem;font-weight:700;margin:10px 0 0;text-align:center;color:var(--navy)}
 
-/* --------------------------------------------------------------- trustbar */
-.trustbar{background:var(--navy);color:#fff}
-.trustbar-inner{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
-  padding-top:18px;padding-bottom:18px;text-align:center;
-}
-.trust-item strong{display:block;font-size:1.15rem;font-weight:900}
-.trust-item span{font-size:.8rem;color:rgba(255,255,255,.75)}
-
 /* --------------------------------------------------------------- sections */
 .section{padding:72px 0}
 .why{background:var(--cream)}
 .why-grid{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:52px;align-items:start}
+.why-lede{color:var(--muted);font-size:1.05rem;max-width:46ch;margin-bottom:1.4em}
 .why-list{list-style:none;margin:0;padding:0;display:grid;gap:22px}
 .why-list h3{margin-bottom:.3em;color:var(--navy)}
 .why-list p{margin:0;color:var(--muted)}
@@ -169,18 +176,97 @@ a{color:var(--navy)}
 .why-media .clip{max-height:520px}
 .media-caption{font-size:.85rem;color:var(--muted);margin-top:12px}
 
-.step-grid{
-  list-style:none;margin:34px 0;padding:0;
-  display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+/* ============================================================================
+   REASONS TO GLO WITH US — Figma kn4sVzLbtOeByUzmvNdvpR node 529:316
+   Source is a 1920px absolute layout; rebuilt as a responsive grid.
+   Figma hexes are scoped to this section rather than added to :root, since they
+   are near-duplicates of the existing --cream / --blush / --blush-soft tokens
+   but not identical. Headline reuses --navy (#293376 vs Figma #273574 — the
+   difference is 2/255 per channel, not worth a second navy).
+   ========================================================================== */
+.reasons{
+  --reasons-bg:#f8f4ef;
+  --reasons-border:#edc7b4;
+  --reasons-grad-a:#edc7b4;
+  --reasons-grad-b:#f0d9ce;
+  --reasons-body:#454545;
+  --font-card:"Montserrat",var(--font-body);
+
+  position:relative;
+  overflow:hidden;
+  background:var(--reasons-bg);
 }
-.step-grid li{
-  background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:26px;
+/* Right-edge line flourish from the source frame. Decorative only. */
+.reasons-flourish{
+  position:absolute;right:0;top:0;height:100%;width:auto;
+  opacity:.9;pointer-events:none;
 }
-.step-num{
-  display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
-  background:var(--navy);color:#fff;font-weight:900;margin-bottom:14px;
+.reasons .wrap{position:relative}
+
+.reasons-title{
+  color:var(--navy);
+  text-align:center;
+  font-size:clamp(1.9rem,4vw,3rem);   /* 48px at desktop */
+  margin-bottom:1.1em;
 }
-.step-grid p{margin:0;color:var(--muted)}
+
+.reasons-grid{
+  list-style:none;margin:0 0 38px;padding:0;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;
+}
+.reason-card{
+  background:var(--reasons-bg);
+  border:1px solid var(--reasons-border);
+  border-radius:10px;
+  padding:30px 22px 34px;
+  text-align:center;
+}
+/* Both dimensions explicit: the exported assets are 101x100 and must not be
+   stretched by the grid track. Circle crop is belt-and-braces — the PNGs
+   already ship with transparent corners. */
+.reason-figure{
+  /* Assets are 101x100. Boxed to a true 100x100 square so border-radius:50%
+     yields a circle, not a 1% ellipse; object-fit:cover crops rather than
+     squashes the half-pixel of overhang. */
+  width:100px;height:100px;
+  margin:0 auto 26px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.reason-label{
+  font-family:var(--font-card);
+  font-weight:600;
+  font-size:18px;
+  line-height:1.49;
+  letter-spacing:0;
+  color:#000;
+  margin:0 0 12px;
+}
+.reason-body{
+  font-family:var(--font-card);
+  font-weight:400;
+  font-size:16px;
+  line-height:1.49;
+  color:var(--reasons-body);
+  margin:0;
+}
+
+.reasons-cta{
+  display:inline-block;
+  font-family:var(--font-card);
+  font-weight:500;
+  font-size:20px;
+  line-height:1.4;
+  text-transform:capitalize;
+  text-decoration:none;
+  color:var(--navy);
+  background:linear-gradient(90deg,var(--reasons-grad-a),var(--reasons-grad-b));
+  border-radius:100px;
+  padding:14px 46px;
+  transition:filter .15s ease,transform .1s ease;
+}
+.reasons-cta:hover{filter:brightness(1.04)}
+.reasons-cta:active{transform:translateY(1px)}
 
 .proof{background:var(--blush-soft)}
 .proof-grid{display:grid;grid-template-columns:260px 1fr;gap:44px;align-items:center}
@@ -222,14 +308,19 @@ address{font-style:normal;font-size:1.1rem;font-weight:500;margin-bottom:.6em}
   .why-media{max-width:420px;margin:0 auto}
   .location-grid{grid-template-columns:minmax(0,1fr);gap:28px}
   .proof-grid{grid-template-columns:200px minmax(0,1fr);gap:28px}
+  /* 4 -> 2x2 at tablet */
+  .reasons-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .reasons-flourish{display:none}
 }
 @media (max-width:640px){
   body{font-size:16px}
   .section{padding:52px 0}
   .header-phone{display:none}
-  .trustbar-inner{grid-template-columns:repeat(2,1fr);gap:16px}
-  .step-grid{grid-template-columns:minmax(0,1fr)}
   .proof-grid{grid-template-columns:minmax(0,1fr);gap:22px}
+  /* 2x2 -> single column at mobile */
+  .reasons-grid{grid-template-columns:minmax(0,1fr);gap:16px}
+  .reason-card{padding:26px 20px 28px}
+  .reasons-cta{font-size:18px;padding:14px 38px}
   .proof-media{max-width:210px}
   .form-card{padding:22px}
   .mobile-cta{display:block}

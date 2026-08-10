@@ -5,7 +5,8 @@
       "name": "lp",
       "runtimeExecutable": "node",
       "runtimeArgs": ["server.js"],
-      "port": 3000
+      "env": { "PORT": "4173" },
+      "port": 4173
     }
   ]
 }

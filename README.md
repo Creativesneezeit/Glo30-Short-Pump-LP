@@ -170,7 +170,9 @@ Each one is marked with a `TODO` comment at the point of use.
 | Phone number `(804) 555-0130` is a placeholder | `index.html` header, location section, footer CTA |
 | Street address and hours are unverified | `index.html` location section |
 | The "$30 off" line was removed from the form card, but the sticky mobile CTA still reads "Book my facial — $30 off" and the footer disclaimer still references an offer | `index.html` sticky mobile CTA + footer |
-| "4.9★ Google rating" in the trust bar is unverified | `index.html` trust bar |
+| "With over 1,000 five-star reviews" — quantifiable claim, came from the client's Figma frame (529:316). Confirm it's still current before spend | `index.html` Reasons section, card 4 |
+| `assets/images/reasons/rep.png` — the badge artwork itself reads **"5 Stars Reviwes"** (typo baked into the client's exported asset). Needs a corrected export | `assets/images/reasons/rep.png` |
+| Reasons card images are 101×100 in the source Figma file — that is their native resolution, so they render soft on 2× displays. Ask the client for larger originals if crispness matters | `assets/images/reasons/*.png` |
 | `<link rel="canonical">` points at `example.com` | `index.html` head |
 | Google Ads conversion ID and label are empty strings — the tag is inert until filled | `thank-you/index.html` |
 

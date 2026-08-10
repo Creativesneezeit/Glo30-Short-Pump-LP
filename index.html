@@ -13,6 +13,11 @@
 
 <link rel="preload" href="/assets/fonts/ArgentumSans-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ArgentumSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+<!-- Playfair Display: editorial accent on h1/h2 only. Argentum Sans stays the body/UI font. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" type="image/webp" fetchpriority="high"
       href="/assets/images/hero/hero-nanoglo-1280.webp"
       imagesrcset="/assets/images/hero/hero-nanoglo-760.webp 760w,
@@ -64,10 +69,13 @@
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <p class="eyebrow">Short Pump &middot; Richmond, VA</p>
-      <h1>Medical-grade facials.<br>Thirty minutes.<br>Real skin change.</h1>
+      <h1>Where Innovation Meets Skincare</h1>
       <p class="lede">
-        A licensed medical esthetician builds your treatment around a free digital
-        skin analysis &mdash; no guesswork, no upselling, no downtime.
+        At GLO30, skincare is smarter, more personalized, and designed around you.
+        We combine innovative technology with expert guidance to create a seamless
+        experience that helps your skin look and feel its best. From the moment you
+        walk in, every detail is designed to make achieving your best GLO feel
+        effortless.
       </p>
       <ul class="hero-points">
         <li>Free 3D skin analysis with your first visit</li>
@@ -142,16 +150,6 @@
   </div>
 </section>
 
-<!-- ========================= TRUST BAR ========================== -->
-<section class="trustbar">
-  <div class="wrap trustbar-inner">
-    <div class="trust-item"><strong>4.9&#9733;</strong><span>Google rating</span></div>
-    <div class="trust-item"><strong>30 min</strong><span>Every treatment</span></div>
-    <div class="trust-item"><strong>0 days</strong><span>Of downtime</span></div>
-    <div class="trust-item"><strong>Short Pump</strong><span>Free parking</span></div>
-  </div>
-</section>
-
 <!-- ========================== WHY GLO30 ========================= -->
 <!-- Clip: esthetician walking a client through her scan on the in-studio
      analysis mirror. It literally shows the "free skin analysis" promise,
@@ -170,56 +168,92 @@
 
     <div class="why-copy">
       <p class="eyebrow">Why GLO30</p>
-      <h2>A facial built off data, not a menu board</h2>
+      <h2>Skincare built on data, not guesswork</h2>
+      <p class="why-lede">
+        GLO30 brings together advanced technology, expert guidance, and a personalized
+        approach to help you make smarter decisions for your skin.
+      </p>
       <ul class="why-list">
         <li>
-          <h3>Free digital skin analysis</h3>
-          <p>Our imaging system reads pigment, texture, pores and hydration below the
-             surface. You see the same screen your esthetician does.</p>
+          <h3>Powered by GLOria AI</h3>
+          <p>Every GLO30 experience starts with a clearer understanding of your skin.
+             The GLOria AI Skin Scan analyzes key skin characteristics to help identify
+             what your skin needs today &mdash; creating a more informed starting point
+             for your personalized skincare journey.</p>
         </li>
         <li>
-          <h3>Medical-grade, not spa-grade</h3>
-          <p>Dermaplaning, hydrodermabrasion, LED, peels and cryo &mdash; matched to
-             what the scan found, adjusted every visit.</p>
+          <h3>Technology meets expertise</h3>
+          <p>We pair innovative skincare technology with experienced professionals to
+             turn skin data into a more personalized experience &mdash; because your
+             skin deserves more than a one-size-fits-all approach.</p>
         </li>
         <li>
-          <h3>Thirty minutes, then back to your day</h3>
-          <p>No redness to hide, no recovery to plan around. Book it between the
-             office and school pickup.</p>
+          <h3>Designed to fit your life</h3>
+          <p>Effective skincare shouldn&rsquo;t have to take over your schedule. GLO30
+             makes it easier to prioritize your skin with streamlined experiences
+             designed around your lifestyle.</p>
         </li>
         <li>
-          <h3>Priced to actually repeat</h3>
-          <p>Skin responds to consistency. Memberships start well under the cost of a
-             single traditional facial &mdash; and you&rsquo;re never required to join.</p>
+          <h3>Better skin starts with consistency</h3>
+          <p>Real skin goals take time. GLO30 makes staying consistent easier with
+             personalized options and flexible ways to build skincare into your
+             routine &mdash; without the pressure of a traditional spa experience.</p>
         </li>
       </ul>
     </div>
   </div>
 </section>
 
-<!-- ======================= HOW IT WORKS ========================= -->
-<section class="section steps">
+<!-- ==================== REASONS TO GLO WITH US ===================
+     Figma: kn4sVzLbtOeByUzmvNdvpR node 529:316 ("third section").
+     Source frame is a fixed 1920px absolute layout; rebuilt here as a
+     responsive grid (4 / 2 / 1 columns). Card images are the exported
+     Figma assets, already circle-cropped with transparent corners. -->
+<section class="section reasons">
+  <img class="reasons-flourish" src="/assets/images/reasons/flourish.png" alt="" aria-hidden="true"
+       width="196" height="593" loading="lazy" decoding="async">
   <div class="wrap">
-    <p class="eyebrow center">Your first visit</p>
-    <h2 class="center">Three steps, thirty minutes</h2>
-    <ol class="step-grid">
-      <li>
-        <span class="step-num">1</span>
-        <h3>Scan</h3>
-        <p>A quick digital analysis maps what&rsquo;s actually happening in your skin.</p>
+    <h2 class="reasons-title">Reasons to GLO with Us</h2>
+
+    <ul class="reasons-grid">
+      <li class="reason-card">
+        <img class="reason-figure" src="/assets/images/reasons/edge.png" alt=""
+             width="101" height="100" loading="lazy" decoding="async">
+        <h3 class="reason-label">Cutting-Edge Customization</h3>
+        <p class="reason-body">Utilizing cutting-edge smart AI technology, each treatment is
+           precision-tailored to meet your specific skin needs.</p>
       </li>
-      <li>
-        <span class="step-num">2</span>
-        <h3>Treat</h3>
-        <p>Your esthetician assembles the treatment on the spot from the scan results.</p>
+
+      <li class="reason-card">
+        <img class="reason-figure" src="/assets/images/reasons/approach.png" alt=""
+             width="101" height="100" loading="lazy" decoding="async">
+        <h3 class="reason-label">All-Inclusive Approach</h3>
+        <p class="reason-body">Our all-inclusive premium SmartGLO facial treatments mean there
+           are no hidden fees or surprise charges.</p>
       </li>
-      <li>
-        <span class="step-num">3</span>
-        <h3>Go</h3>
-        <p>Walk out glowing with a plain-English plan for what to do next.</p>
+
+      <li class="reason-card">
+        <img class="reason-figure" src="/assets/images/reasons/adapted.png" alt=""
+             width="101" height="100" loading="lazy" decoding="async">
+        <h3 class="reason-label">Seasonally Adapted</h3>
+        <p class="reason-body">Each month, our treatments evolves to incorporate the best of
+           what the season has to offer, this approach ensures your treatment is fresh,
+           effective and attuned to the environmental factors that impact your skin.</p>
       </li>
-    </ol>
-    <p class="center"><a class="btn" href="#lead-form" data-cta="steps-book">Book my first facial</a></p>
+
+      <li class="reason-card">
+        <!-- Badge graphic, not a photo. TODO: the artwork itself reads "5 Stars Reviwes"
+             (typo in the source asset) — needs a corrected export from the client. -->
+        <img class="reason-figure" src="/assets/images/reasons/rep.png" alt=""
+             width="101" height="100" loading="lazy" decoding="async">
+        <h3 class="reason-label">Our Reputation</h3>
+        <p class="reason-body">With over 1,000 five-star reviews from our loyal clients, the
+           results speak for themselves. Our treatments, designed by expert physicians, set
+           the standard for excellence in the industry.</p>
+      </li>
+    </ul>
+
+    <p class="center"><a class="reasons-cta" href="#lead-form" data-cta="reasons-learn-more">Learn more</a></p>
   </div>
 </section>
 
@@ -237,9 +271,9 @@
       </video>
     </div>
     <div class="proof-quote">
-      <h2>Thirty minutes, then back to your day</h2>
-      <p>No downtime to plan around and no before-and-after theatrics &mdash; just a
-         treatment matched to your scan and a plain-English plan for what comes next.</p>
+      <h2>Skincare that fits your life</h2>
+      <p>No complicated routines or unnecessary steps &mdash; just innovative, personalized
+         skincare guided by data and expert insight, with a clear plan for what comes next.</p>
     </div>
   </div>
 </section>
