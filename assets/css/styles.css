@@ -266,7 +266,7 @@ a{color:var(--navy)}
 .clip-round{aspect-ratio:1/1;border-radius:50%}
 .proof-quote{margin:0}
 .proof-quote h2{margin-bottom:.35em}
-.proof-quote p{font-size:1.08rem;color:var(--muted);margin:0;max-width:44ch}
+.proof-quote p{font-size:1.08rem;color:var(--muted);margin:0;}
 
 .location-grid{display:grid;grid-template-columns:1fr 380px;gap:44px;align-items:center}
 address{font-style:normal;font-size:1.1rem;font-weight:500;margin-bottom:.6em}
