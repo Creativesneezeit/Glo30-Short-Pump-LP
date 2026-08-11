@@ -99,7 +99,9 @@
 
         <div class="field">
           <label for="f-phone">Mobile number</label>
-          <input id="f-phone" name="phone" type="tel" inputmode="tel"
+          <!-- maxlength 14 = "(XXX) XXX-XXXX". Belt-and-braces cap; main.js also
+               slices input to 10 digits, and server.js re-validates regardless. -->
+          <input id="f-phone" name="phone" type="tel" inputmode="tel" maxlength="14"
                  autocomplete="tel" required placeholder="Your mobile number">
           <span class="err" data-err-for="phone"></span>
         </div>

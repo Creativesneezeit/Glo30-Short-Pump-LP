@@ -127,6 +127,31 @@ function parseBody(raw, contentType) {
   return Object.fromEntries(new URLSearchParams(raw));
 }
 
+/**
+ * Normalise a US phone number to E.164, independently of whatever the client
+ * claims to have sent. Returns null when the value cannot be a US number, so
+ * the caller can reject before spending a request on GHL.
+ *   10 digits            -> +1XXXXXXXXXX
+ *   11 digits led by "1" -> +1XXXXXXXXXX
+ *   anything else        -> null
+ */
+function normalizeUsPhone(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  if (digits.length === 10) return '+1' + digits;
+  if (digits.length === 11 && digits[0] === '1') return '+' + digits;
+  return null;
+}
+
+/**
+ * Log-safe rendering of a phone number: country code + first six digits, the
+ * rest bulleted. "+18045550130" -> "+1804555••••". Never use this for the
+ * value sent to GHL — only for anything written to stdout/stderr.
+ */
+function maskPhone(value) {
+  const m = String(value || '').match(/^(\+\d)(\d{6})(\d*)$/);
+  return m ? m[1] + m[2] + '•'.repeat(m[3].length) : '••••';
+}
+
 function splitName(full) {
   const parts = String(full || '').trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return { firstName: '', lastName: '' };
@@ -151,10 +176,23 @@ async function handleLead(req, res) {
   }
 
   const email = String(data.email || '').trim();
-  const phone = String(data.phone || '').trim();
-  if (!email && !phone) {
-    return sendJson(res, 400, { ok: false, error: 'email_or_phone_required' });
+  const rawPhone = String(data.phone || '').trim();
+
+  // Phone is mandatory. Checked before normalizeUsPhone so a missing number and
+  // a malformed one give distinct errors.
+  if (!rawPhone) {
+    console.warn('[lead] rejected: phone number missing');
+    return sendJson(res, 400, { ok: false, error: 'Phone number is required' });
   }
+
+  // Never trust the client's formatting. The number must be a valid US one, or
+  // the request is rejected here — before GHL sees it.
+  const phone = normalizeUsPhone(rawPhone);
+  if (!phone) {
+    console.warn('[lead] rejected: invalid US phone number');
+    return sendJson(res, 400, { ok: false, error: 'Invalid US phone number' });
+  }
+  console.log('[lead] phone normalized to E.164:', maskPhone(phone));
 
   const { firstName, lastName } = splitName(data.name);
   const interest = String(data.interest || '').trim();
@@ -216,7 +254,7 @@ async function handleLead(req, res) {
     if (ghlRes.ok) {
       let contactId = null;
       try { contactId = (JSON.parse(text).contact || {}).id || null; } catch { /* non-JSON 2xx */ }
-      console.log('[lead] delivered to GHL', { contactId, interest, email: email || phone });
+      console.log('[lead] delivered to GHL', { contactId, interest, email, phone: maskPhone(phone) });
       return sendJson(res, 200, { ok: true, delivered: true, redirect: '/thank-you/' });
     }
 

@@ -67,10 +67,72 @@
 
   var status = form.querySelector('.form-status');
 
+  /* ------------------------------------------------------ US phone handling */
+  // Display format is (XXX) XXX-XXXX. Only ever 10 digits are kept; the value
+  // is converted to E.164 (+1XXXXXXXXXX) at submit time, not while typing, so
+  // the field stays readable and the GHL tracking script still sees a normal
+  // phone-looking value.
+  function phoneDigits(value) {
+    return String(value || '').replace(/\D/g, '').slice(0, 10);
+  }
+
+  function formatUsPhone(digits) {
+    if (!digits) return '';
+    if (digits.length <= 3) return '(' + digits;
+    if (digits.length <= 6) return '(' + digits.slice(0, 3) + ') ' + digits.slice(3);
+    return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+  }
+
+  function toE164(digits) {
+    return digits.length === 10 ? '+1' + digits : '';
+  }
+
+  // Caret preservation: count digits left of the caret, reformat, then put the
+  // caret back after that same digit. Without this, editing mid-number throws
+  // the cursor to the end on every keystroke.
+  function digitsBeforeCaret(value, caret) {
+    return String(value).slice(0, caret).replace(/\D/g, '').length;
+  }
+
+  function caretAfterNthDigit(formatted, n) {
+    if (n <= 0) return 0;
+    var seen = 0;
+    for (var i = 0; i < formatted.length; i++) {
+      if (formatted[i] >= '0' && formatted[i] <= '9') {
+        seen++;
+        if (seen === n) return i + 1;
+      }
+    }
+    return formatted.length;
+  }
+
+  var phoneInput = form.elements.phone;
+  if (phoneInput) {
+    phoneInput.addEventListener('input', function () {
+      var caret = phoneInput.selectionStart;
+      var kept = digitsBeforeCaret(phoneInput.value, caret);
+      var formatted = formatUsPhone(phoneDigits(phoneInput.value));
+      if (formatted === phoneInput.value) return;
+      phoneInput.value = formatted;
+      // Only reposition when the field has focus; setSelectionRange on a
+      // blurred input steals focus in some browsers.
+      if (document.activeElement === phoneInput) {
+        var pos = caretAfterNthDigit(formatted, kept);
+        phoneInput.setSelectionRange(pos, pos);
+      }
+    });
+
+    // Paste lands as an input event, so formatting is already covered. This
+    // only normalises an autofilled value that arrives without one.
+    phoneInput.addEventListener('change', function () {
+      phoneInput.value = formatUsPhone(phoneDigits(phoneInput.value));
+    });
+  }
+
   var rules = {
     name:  function (v) { return v.trim().length >= 2 || 'Please enter your name.'; },
     phone: function (v) {
-      return (v.replace(/\D/g, '').length >= 10) || 'Please enter a 10-digit phone number.';
+      return phoneDigits(v).length === 10 || 'Enter a valid 10-digit US phone number';
     },
     email: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) || 'Please enter a valid email.'; },
     interest: function (v) { return v !== '' || 'Please pick what you’re interested in.'; }
@@ -124,13 +186,19 @@
     button.disabled = true;
     status.textContent = 'Sending…';
 
+    // Send E.164 on the wire while the visible field keeps its (XXX) XXX-XXXX
+    // formatting — overriding the param avoids mutating the input, which would
+    // both look wrong to the user and change what the GHL tracking script reads.
+    var params = new URLSearchParams(new FormData(form));
+    params.set('phone', toE164(phoneDigits(form.elements.phone.value)));
+
     // The GHL external-tracking script listens on this same submit event and
     // captures the lead client-side. Our POST is the primary path; if it fails
     // the visitor still lands on /thank-you/ and GHL still has the lead.
     fetch(form.action, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(new FormData(form)).toString()
+      body: params.toString()
     })
       .then(function (res) { return res.json().catch(function () { return {}; }); })
       .then(function (data) {
