@@ -131,13 +131,7 @@ a{color:var(--navy)}
   align-items:center;padding-top:64px;padding-bottom:64px;
 }
 .lede{font-size:1.1rem;color:rgba(255,255,255,.9);max-width:34em}
-.hero-points{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:11px}
-.hero-points li{position:relative;padding-left:30px;font-weight:500}
-.hero-points li::before{
-  content:"";position:absolute;left:0;top:.42em;width:16px;height:9px;
-  border-left:3px solid var(--blush);border-bottom:3px solid var(--blush);
-  transform:rotate(-45deg);
-}
+.lede+.lede{margin-top:-.35em}
 
 /* -------------------------------------------------------------- lead form */
 .form-card{
@@ -164,7 +158,6 @@ a{color:var(--navy)}
 .section{padding:72px 0}
 .why{background:var(--cream)}
 .why-grid{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:52px;align-items:start}
-.why-lede{color:var(--muted);font-size:1.05rem;max-width:46ch;margin-bottom:1.4em}
 .why-list{list-style:none;margin:0;padding:0;display:grid;gap:22px}
 .why-list h3{margin-bottom:.3em;color:var(--navy)}
 .why-list p{margin:0;color:var(--muted)}
