@@ -236,6 +236,10 @@ async function handleLead(req, res) {
     payload.customFields = [{ id: INTEREST_FIELD_ID, field_value: interestLabel }];
   }
 
+  // TEMPORARY DEBUG — remove before launch. Prints the exact name values going
+  // to GHL, unmasked, so the split can be checked against a real submission.
+  console.log('[lead][debug] outgoing name fields:', JSON.stringify({ firstName: payload.firstName, lastName: payload.lastName, name: payload.name }));
+
   try {
     const ghlRes = await fetch(GHL_CONTACTS_URL, {
       method: 'POST',
