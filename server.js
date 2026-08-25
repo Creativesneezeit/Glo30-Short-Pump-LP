@@ -35,8 +35,8 @@ const LOCATION_ID = process.env.GHL_LOCATION_ID;
 const INTEREST_FIELD_ID = process.env.GHL_INTEREST_FIELD_ID;
 
 const INTEREST_LABELS = {
-  'smart-glo-99': '$99 Smart GLO',
-  'tox': 'Tox offer',
+  'smart-glo-99': '$99 SmartGLO',
+  'tox': 'TOX offer',
   'nano-glo': 'Limited NanoGLO promo',
   'gloria-ai-scan': 'GLOria AI scan'
 };

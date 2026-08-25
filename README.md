@@ -167,8 +167,7 @@ Each one is marked with a `TODO` comment at the point of use.
 
 | What | Where |
 |---|---|
-| Phone number `(804) 555-0130` is a placeholder | `index.html` header, location section, footer CTA |
-| Street address and hours are unverified | `index.html` location section |
+| Opening hours are still unverified — address and phone are now the real listing | `index.html` location section |
 | The "$30 off" line was removed from the form card, but the sticky mobile CTA still reads "Book my facial — $30 off" and the footer disclaimer still references an offer | `index.html` sticky mobile CTA + footer |
 | "With over 1,000 five-star reviews" — quantifiable claim, came from the client's Figma frame (529:316). Confirm it's still current before spend | `index.html` Reasons section, card 4 |
 | `assets/images/reasons/rep.png` — the badge artwork itself reads **"5 Stars Reviwes"** (typo baked into the client's exported asset). Needs a corrected export | `assets/images/reasons/rep.png` |

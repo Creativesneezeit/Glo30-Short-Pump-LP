@@ -273,6 +273,10 @@ address{font-style:normal;font-size:1.1rem;font-weight:500;margin-bottom:.6em}
 .hours{color:var(--muted)}
 .location-cta{background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:28px}
 .location-cta h3{font-size:1.3rem}
+/* This one h2 only. Playfair renders old-style figures, so the "30" in
+   "GLO30" drops below the baseline at x-height; the brand sans keeps the
+   numerals on the cap line. Every other h2 stays on --font-display. */
+.location h2{font-family:var(--font-body);font-weight:900}
 
 /* thank-you page */
 .ty-wrap{max-width:640px;text-align:center;padding-top:24px;padding-bottom:24px}
