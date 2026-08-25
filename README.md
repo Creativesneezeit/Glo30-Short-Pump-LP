@@ -168,7 +168,7 @@ Each one is marked with a `TODO` comment at the point of use.
 | What | Where |
 |---|---|
 | Opening hours are still unverified — address and phone are now the real listing | `index.html` location section |
-| The "$30 off" line was removed from the form card, but the sticky mobile CTA still reads "Book my facial — $30 off" and the footer disclaimer still references an offer | `index.html` sticky mobile CTA + footer |
+| No offer is stated anywhere on the page any more, but the footer disclaimer still reads "Offer valid for first-time guests" | `index.html` footer |
 | "With over 1,000 five-star reviews" — quantifiable claim, came from the client's Figma frame (529:316). Confirm it's still current before spend | `index.html` Reasons section, card 4 |
 | `assets/images/reasons/rep.png` — the badge artwork itself reads **"5 Stars Reviwes"** (typo baked into the client's exported asset). Needs a corrected export | `assets/images/reasons/rep.png` |
 | Reasons card images are 101×100 in the source Figma file — that is their native resolution, so they render soft on 2× displays. Ask the client for larger originals if crispness matters | `assets/images/reasons/*.png` |
