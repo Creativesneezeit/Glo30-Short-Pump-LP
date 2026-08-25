@@ -1,4 +1,4 @@
-/* GLO30 Short Pump LP — lazy video, attribution capture, form handling */
+/* GLO3O Short Pump LP — lazy video, attribution capture, form handling */
 (function () {
   'use strict';
 

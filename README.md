@@ -1,4 +1,4 @@
-# GLO30 Short Pump — Google Ads landing page
+# GLO3O Short Pump — Google Ads landing page
 
 Node server (no framework, no dependencies) serving a static page plus one lead route.
 Runs on Railway via `npm start`.
@@ -114,7 +114,7 @@ Both remaining clips are 1080×1920 vertical social reels, silent, and loop acce
 
 | Source | Content | Placement | Reason |
 |---|---|---|---|
-| `Img 5749.webm` | Esthetician walking a client through her scan on the in-studio analysis mirror | **"Why GLO30" section** (`skin-analysis`) | Literally depicts the free-skin-analysis differentiator, so it earns a spot beside that copy instead of being decoration. |
+| `Img 5749.webm` | Esthetician walking a client through her scan on the in-studio analysis mirror | **"Why GLO3O" section** (`skin-analysis`) | Literally depicts the free-skin-analysis differentiator, so it earns a spot beside that copy instead of being decoration. |
 | `Img 5752.webm` | Client filming herself in her car after an appointment, 3.5 s | **Proof section** (`client-review`) | Warm, real, human. Cropped to a circle beside the "thirty minutes" copy. |
 
 ### MP4 fallbacks — generated, not stubbed

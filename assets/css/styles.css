@@ -1,5 +1,5 @@
 /* ==========================================================================
-   GLO30 Short Pump — Google Ads landing page
+   GLO3O Short Pump — Google Ads landing page
    ========================================================================== */
 
 @font-face{font-family:"Argentum Sans";src:url("/assets/fonts/ArgentumSans-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
@@ -273,9 +273,9 @@ address{font-style:normal;font-size:1.1rem;font-weight:500;margin-bottom:.6em}
 .hours{color:var(--muted)}
 .location-cta{background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:28px}
 .location-cta h3{font-size:1.3rem}
-/* This one h2 only. Playfair renders old-style figures, so the "30" in
-   "GLO30" drops below the baseline at x-height; the brand sans keeps the
-   numerals on the cap line. Every other h2 stays on --font-display. */
+/* This one h2 only. Playfair renders old-style figures, so the "3" in
+   "GLO3O" drops below the baseline at x-height; the brand sans keeps the
+   numeral on the cap line. Every other h2 stays on --font-display. */
 .location h2{font-family:var(--font-body);font-weight:900}
 
 /* thank-you page */

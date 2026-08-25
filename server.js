@@ -1,5 +1,5 @@
 /**
- * GLO30 Short Pump LP — static file server + lead delivery to GoHighLevel.
+ * GLO3O Short Pump LP — static file server + lead delivery to GoHighLevel.
  *
  * No framework: the project had no backend at all before this, so this is plain
  * node:http with zero dependencies. Node 18+ for global fetch.
