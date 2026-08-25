@@ -151,7 +151,23 @@ a{color:var(--navy)}
 .err{display:none;font-size:.8rem;color:#c0392b;margin-top:4px}
 .field.invalid .err{display:block}
 .hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
-.form-fine{font-size:.78rem;color:var(--muted);margin:12px 0 0;text-align:center}
+/* Consent checkbox. Borrows the fine-print type scale the old .form-fine
+   paragraph used, and the .field/.err error pattern every other field uses, so
+   it introduces no new visual language. The rules are two classes deep to beat
+   `.field label` (block/bold/.83rem), and the input rules undo the full-width
+   `.field input` box styling above. */
+.field-consent{margin:18px 0 4px}
+.field-consent .consent{
+  display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin:0;
+  font-size:.78rem;line-height:1.45;font-weight:400;color:var(--muted);
+}
+.field-consent .consent input[type="checkbox"]{
+  width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;padding:0;
+  border:0;border-radius:0;box-shadow:none;background:none;
+  accent-color:var(--navy);cursor:pointer;
+}
+.field-consent.invalid .consent{color:var(--ink)}
+.field-consent.invalid .consent input[type="checkbox"]{outline:2px solid #c0392b;outline-offset:2px}
 .form-status{font-size:.9rem;font-weight:700;margin:10px 0 0;text-align:center;color:var(--navy)}
 
 /* --------------------------------------------------------------- sections */

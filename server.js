@@ -26,6 +26,7 @@ const GHL_CONTACTS_URL = 'https://services.leadconnectorhq.com/contacts/';
 const GHL_API_VERSION = '2021-07-28';
 const LEAD_TAG = 'short-pump-landing';
 const LEAD_SOURCE = 'Google Ads - Short Pump Lander';
+const CONSENT_TAG = 'marketing-consent';
 
 // Read from the environment only. Never hardcode, never default to a fake value.
 const TOKEN = process.env.GHL_PRIVATE_INTEGRATION_TOKEN;
@@ -33,6 +34,9 @@ const LOCATION_ID = process.env.GHL_LOCATION_ID;
 // Optional: if the GHL location has a custom field for the offer, set its id here
 // and the interest value gets written to it as well as tagged.
 const INTEREST_FIELD_ID = process.env.GHL_INTEREST_FIELD_ID;
+// Optional: a GHL custom field to hold the consent timestamp. Without it the
+// consent is still tagged and logged, just not stored as a field on the contact.
+const CONSENT_FIELD_ID = process.env.GHL_CONSENT_FIELD_ID;
 
 const INTEREST_LABELS = {
   'smart-glo-99': '$99 SmartGLO',
@@ -98,6 +102,55 @@ function sendJson(res, code, obj) {
   send(res, code, JSON.stringify(obj), 'application/json; charset=utf-8');
 }
 
+/**
+ * True when the request is a browser navigation rather than fetch/XHR — i.e. the
+ * native form POST that happens when JS is disabled or died before it could call
+ * preventDefault(). Our fetch() sends no Accept header, so it arrives as the
+ * default wildcard and lands on the JSON branch.
+ */
+function prefersHtml(req) {
+  if (String(req.headers['sec-fetch-mode'] || '').toLowerCase() === 'navigate') return true;
+  return String(req.headers.accept || '').indexOf('text/html') !== -1;
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+/**
+ * One reply for both audiences. A navigating browser gets a 303 to the
+ * thank-you page on success, or a small HTML page on a validation failure —
+ * never raw JSON. fetch() callers keep the JSON contract unchanged.
+ */
+function respondLead(req, res, code, payload) {
+  if (!prefersHtml(req)) return sendJson(res, code, payload);
+
+  if (payload && payload.ok) {
+    const to = payload.redirect || '/thank-you/';
+    res.writeHead(303, {
+      Location: to,
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-store'
+    });
+    return res.end('Redirecting to ' + to);
+  }
+
+  const message = escapeHtml((payload && payload.error) || 'Something went wrong.');
+  send(res, code, '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Check your details | GLO3O Short Pump</title>' +
+    '<meta name="robots" content="noindex, nofollow">' +
+    '<link rel="stylesheet" href="/assets/css/styles.css"></head><body>' +
+    '<section class="section"><div class="wrap ty-wrap">' +
+    '<p class="eyebrow">We could not send that</p>' +
+    '<h1 class="ty-title">Check your details</h1>' +
+    '<p class="lede ty-lede">' + message + '</p>' +
+    '<p><a class="btn" href="/#lead-form">Back to the form</a></p>' +
+    '</div></section></body></html>', 'text/html; charset=utf-8');
+}
+
 /* --------------------------------------------------------------- lead route */
 
 const MAX_BODY = 16 * 1024;
@@ -136,10 +189,23 @@ function parseBody(raw, contentType) {
  *   anything else        -> null
  */
 function normalizeUsPhone(value) {
-  const digits = String(value || '').replace(/\D/g, '');
-  if (digits.length === 10) return '+1' + digits;
-  if (digits.length === 11 && digits[0] === '1') return '+' + digits;
-  return null;
+  let digits = String(value || '').replace(/\D/g, '');
+  // Mirror of phoneDigits() on the client: drop a leading country code first,
+  // then demand exactly ten. Same shape in both places so the two cannot drift.
+  if (digits.length === 11 && digits[0] === '1') digits = digits.slice(1);
+  if (digits.length !== 10) return null;
+  return '+1' + digits;
+}
+
+/**
+ * A checked HTML checkbox posts its value attribute ("yes" here), or "on" when
+ * no value is set. JSON clients may send a real boolean. Anything else counts as
+ * no consent.
+ */
+function consentGiven(value) {
+  if (value === true) return true;
+  const v = String(value === undefined || value === null ? '' : value).trim().toLowerCase();
+  return v === 'yes' || v === 'on' || v === 'true' || v === '1';
 }
 
 /**
@@ -164,7 +230,7 @@ async function handleLead(req, res) {
   try {
     raw = await readBody(req);
   } catch {
-    return sendJson(res, 413, { ok: false, error: 'payload_too_large' });
+    return respondLead(req, res, 413, { ok: false, error: 'The form was too large to process.' });
   }
 
   const data = parseBody(raw, req.headers['content-type']);
@@ -172,7 +238,7 @@ async function handleLead(req, res) {
   // Honeypot: pretend everything went fine, deliver nothing.
   if (data.company) {
     console.log('[lead] honeypot triggered, discarded');
-    return sendJson(res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
+    return respondLead(req, res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
   }
 
   const email = String(data.email || '').trim();
@@ -182,7 +248,7 @@ async function handleLead(req, res) {
   // a malformed one give distinct errors.
   if (!rawPhone) {
     console.warn('[lead] rejected: phone number missing');
-    return sendJson(res, 400, { ok: false, error: 'Phone number is required' });
+    return respondLead(req, res, 400, { ok: false, error: 'Phone number is required' });
   }
 
   // Never trust the client's formatting. The number must be a valid US one, or
@@ -190,9 +256,30 @@ async function handleLead(req, res) {
   const phone = normalizeUsPhone(rawPhone);
   if (!phone) {
     console.warn('[lead] rejected: invalid US phone number');
-    return sendJson(res, 400, { ok: false, error: 'Invalid US phone number' });
+    return respondLead(req, res, 400, { ok: false, error: 'Invalid US phone number' });
   }
   console.log('[lead] phone normalized to E.164:', maskPhone(phone));
+
+  // Consent is checked independently of the client, same principle as the phone.
+  // The timestamp is the server's receipt time, not anything the client sent.
+  if (!consentGiven(data.consent)) {
+    console.warn('[lead] rejected: marketing consent not given');
+    return respondLead(req, res, 400, {
+      ok: false,
+      error: 'Please check the consent box to submit this form'
+    });
+  }
+  const consentAt = new Date().toISOString();
+
+  // Audit trail. Logged here rather than next to the GHL call so the record
+  // exists even when delivery is unconfigured or fails. Phone stays masked; the
+  // timestamp is the server's receipt time, not client-supplied.
+  console.log('[lead] marketing consent recorded', {
+    at: consentAt,
+    tag: CONSENT_TAG,
+    email,
+    phone: maskPhone(phone)
+  });
 
   const { firstName, lastName } = splitName(data.name);
   const interest = String(data.interest || '').trim();
@@ -205,10 +292,10 @@ async function handleLead(req, res) {
       '[lead] NOT DELIVERED — missing env vars:',
       [!TOKEN && 'GHL_PRIVATE_INTEGRATION_TOKEN', !LOCATION_ID && 'GHL_LOCATION_ID'].filter(Boolean).join(', ')
     );
-    return sendJson(res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
+    return respondLead(req, res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
   }
 
-  const tags = [LEAD_TAG];
+  const tags = [LEAD_TAG, CONSENT_TAG];
   if (interest) tags.push('interest-' + interest);
 
   const payload = {
@@ -232,9 +319,14 @@ async function handleLead(req, res) {
     }
   };
 
+  const customFields = [];
   if (INTEREST_FIELD_ID && interestLabel) {
-    payload.customFields = [{ id: INTEREST_FIELD_ID, field_value: interestLabel }];
+    customFields.push({ id: INTEREST_FIELD_ID, field_value: interestLabel });
   }
+  if (CONSENT_FIELD_ID) {
+    customFields.push({ id: CONSENT_FIELD_ID, field_value: consentAt });
+  }
+  if (customFields.length) payload.customFields = customFields;
 
   try {
     const ghlRes = await fetch(GHL_CONTACTS_URL, {
@@ -255,15 +347,15 @@ async function handleLead(req, res) {
       let contactId = null;
       try { contactId = (JSON.parse(text).contact || {}).id || null; } catch { /* non-JSON 2xx */ }
       console.log('[lead] delivered to GHL', { contactId, interest, email, phone: maskPhone(phone) });
-      return sendJson(res, 200, { ok: true, delivered: true, redirect: '/thank-you/' });
+      return respondLead(req, res, 200, { ok: true, delivered: true, redirect: '/thank-you/' });
     }
 
     // Duplicates are the common 400 here and are not a real failure.
     console.error('[lead] GHL rejected', ghlRes.status, text.slice(0, 500));
-    return sendJson(res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
+    return respondLead(req, res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
   } catch (err) {
     console.error('[lead] GHL request failed:', err && err.message);
-    return sendJson(res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
+    return respondLead(req, res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
   }
 }
 
@@ -279,7 +371,7 @@ const server = http.createServer((req, res) => {
     }
     return handleLead(req, res).catch((err) => {
       console.error('[lead] unhandled:', err);
-      sendJson(res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
+      respondLead(req, res, 200, { ok: true, delivered: false, redirect: '/thank-you/' });
     });
   }
 

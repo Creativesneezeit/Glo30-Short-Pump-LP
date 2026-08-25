@@ -60,6 +60,7 @@ there are no defaults and no hardcoded fallbacks.
 | `GHL_PRIVATE_INTEGRATION_TOKEN` | yes | Bearer token for the v2 API |
 | `GHL_LOCATION_ID` | yes | GHL sub-account the contact lands in |
 | `GHL_INTEREST_FIELD_ID` | no | If set, the offer label is also written to this custom field. Without it, the offer is captured as a tag only. |
+| `GHL_CONSENT_FIELD_ID` | no | If set, the marketing-consent timestamp (server-side ISO 8601) is written to this custom field. Without it, consent is still tagged `marketing-consent` and written to the logs. |
 | `PORT` | no | Railway sets this automatically |
 
 Without the two required vars the server boots, serves the site, and logs

@@ -136,13 +136,18 @@
         <!-- Honeypot: real people never fill this -->
         <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 
+        <div class="field field-consent">
+          <label class="consent" for="f-consent">
+            <input id="f-consent" name="consent" type="checkbox" value="yes" required>
+            <span>By checking the box, you consent to receiving promotional/advertising texts to your mobile phone number provided in the form and/or to your email address given. You may opt-out at any time.</span>
+          </label>
+          <span class="err" data-err-for="consent"></span>
+        </div>
+
         <button class="btn btn-block" type="submit" data-cta="form-submit">
           SUBMIT
         </button>
 
-        <p class="form-fine">
-          We&rsquo;ll text you to confirm a time. No spam, and you can opt out anytime.
-        </p>
         <p class="form-status" role="status" aria-live="polite"></p>
       </form>
     </div>
