@@ -71,12 +71,12 @@ Railway picked the vars up.
 
 ### Interest values posted
 
-`smart-glo-99` · `tox` · `nano-glo` · `gloria-ai-scan`
+`smart-glo-99` · `tox-425` · `nano-glo-350` · `gloria-ai-scan-free`
 
 ### Log lines to watch
 
 ```
-[lead] delivered to GHL { contactId: '...', interest: 'nano-glo', email: '...' }
+[lead] delivered to GHL { contactId: '...', interest: 'nano-glo-350', email: '...' }
 [lead] GHL rejected 401 {"statusCode":401,"message":"Invalid JWT"}
 [lead] NOT DELIVERED — missing env vars: GHL_PRIVATE_INTEGRATION_TOKEN
 [lead] honeypot triggered, discarded
@@ -193,8 +193,8 @@ Hidden fields already capture `utm_source`, `utm_medium`, `utm_campaign`, `utm_t
 and `gclid` from the query string, plus `landing_page=short-pump`. A honeypot field
 named `company` silently drops bots.
 
-The `interest` select is **required** and posts one of `smart-glo-99`, `tox`,
-`nano-glo`, `gloria-ai-scan`. It defaults to a disabled "Choose one" so nobody's lead
+The `interest` select is **required** and posts one of `smart-glo-99`, `tox-425`,
+`nano-glo-350`, `gloria-ai-scan-free`. It defaults to a disabled "Choose one" so nobody's lead
 gets silently tagged with the first option. The chosen value also rides along on the
 `generate_lead` dataLayer push, so you can segment conversions by offer in GTM.
 

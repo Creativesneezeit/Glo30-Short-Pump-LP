@@ -40,9 +40,9 @@ const CONSENT_FIELD_ID = process.env.GHL_CONSENT_FIELD_ID;
 
 const INTEREST_LABELS = {
   'smart-glo-99': '$99 SmartGLO',
-  'tox': 'TOX offer',
-  'nano-glo': 'Limited NanoGLO promo',
-  'gloria-ai-scan': 'GLOria AI scan'
+  'tox-425': '3 areas of TOX for $425',
+  'nano-glo-350': '$350 NanoGLO Filler Microinfusion Treatment',
+  'gloria-ai-scan-free': 'Free GLOria AI Scan'
 };
 
 /* ------------------------------------------------------------ static files */
